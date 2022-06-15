@@ -1,9 +1,9 @@
 import {CanActivate, ExecutionContext, HttpException, HttpStatus, mixin, Type} from '@nestjs/common';
 import {Observable} from 'rxjs';
 import {GqlExecutionContext} from '@nestjs/graphql';
-import {RoleEnum} from '../enums/role.enum';
+import {RoleType} from '../enums/role.type';
 
-export const RoleGuard = (role: RoleEnum): Type<CanActivate> => {
+export const RoleGuard = (role: RoleType): Type<CanActivate> => {
   class RoleGuardMixin implements CanActivate {
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
       const ctx = GqlExecutionContext.create(context);

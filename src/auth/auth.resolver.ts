@@ -1,6 +1,6 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
-import {User} from '../user/entities/user.entity';
-import {SetMetadata, UseGuards, UsePipes, ValidationPipe} from '@nestjs/common';
+import {UserNode} from '../user/entities/user.entity';
+import {UseGuards, UsePipes, ValidationPipe} from '@nestjs/common';
 import {AuthService} from './auth.service';
 import {CreateUserInput} from '../user/dto/create-user.input';
 import {LoginUserResponse} from './dto/login-user.response';
@@ -15,10 +15,10 @@ export class AuthResolver {
   ) {
   }
 
-  @Query(() => User)
+  @Query(() => UserNode)
   @UseGuards(AuthGuard)
   async getCurrentUser(@EncUser('idNumber') currentUserId: number) {
-    return await this.authService.getCurrentUser(currentUserId)
+    return await this.authService.getCurrentUser(currentUserId);
   }
 
   @Mutation(() => LoginUserResponse)
@@ -28,9 +28,9 @@ export class AuthResolver {
     return this.authService.buildUserResponseForLogin(user);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => UserNode)
   @UsePipes(new ValidationPipe())
-  async register(@Args('createUserInput') createUserInput: CreateUserInput): Promise<User> {
+  async register(@Args('createUserInput') createUserInput: CreateUserInput): Promise<UserNode> {
     const user = await this.authService.register(createUserInput);
     return user;
   }

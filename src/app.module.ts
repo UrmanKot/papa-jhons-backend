@@ -1,26 +1,33 @@
 import {MiddlewareConsumer, Module, NestModule, RequestMethod} from '@nestjs/common';
-import { AppService } from './app.service';
+import {AppService} from './app.service';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
 import {TypeOrmModule, TypeOrmModuleAsyncOptions} from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { SharedModule } from './shared/shared.module';
+import {AuthModule} from './auth/auth.module';
+import {UserModule} from './user/user.module';
 import {AuthMiddleware} from './auth/middlewares/auth.middleware';
 import {GraphQLError, GraphQLFormattedError} from 'graphql';
+import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
+import {FilesModule} from './shared/modules/files/files.module';
+import { ProductModule } from './product/product.module';
+import {GlobalIdScalar} from 'nestjs-relay';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: './.env' }),
+    ConfigModule.forRoot({isGlobal: true, envFilePath: './.env'}),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
+      buildSchemaOptions: {
+        numberScalarMode: 'integer'
+      },
+      path: '/graphql',
       sortSchema: true,
       playground: true,
       formatError: (error: GraphQLError) => {
         const graphQLFormattedError: GraphQLFormattedError = {
-        // @ts-ignore
+          // @ts-ignore
           message: error.extensions?.exception?.response?.message || error.message,
         };
         return graphQLFormattedError;
@@ -36,7 +43,7 @@ import {GraphQLError, GraphQLFormattedError} from 'graphql';
         database: config.get<string>('TYPEORM_DATABASE'),
         username: config.get<string>('TYPEORM_USERNAME'),
         password: config.get<string>('TYPEORM_PASSWORD'),
-        entities: [ __dirname + 'dist/**/*.entity{.ts,.js}' ],
+        entities: [__dirname + 'dist/**/*.entity{.ts,.js}'],
         synchronize: false,
         autoLoadEntities: true,
         logging: true,
@@ -44,16 +51,15 @@ import {GraphQLError, GraphQLFormattedError} from 'graphql';
     }),
     AuthModule,
     UserModule,
-    SharedModule,
+    FilesModule,
+    ProductModule
   ],
-  providers: [AppService],
+  providers: [AppService, GlobalIdScalar],
 })
 
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(AuthMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.ALL
-    });
+    consumer.apply(AuthMiddleware).forRoutes({path: '*', method: RequestMethod.ALL});
+    consumer.apply(graphqlUploadExpress()).forRoutes('graphql');
   }
 }

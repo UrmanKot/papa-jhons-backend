@@ -1,11 +1,11 @@
 import {BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn} from 'typeorm';
 import {hash} from 'bcrypt';
-import {RoleEnum} from '../../auth/enums/role.enum';
+import {RoleType} from '../../auth/enums/role.type';
 import {Field, HideField, ID, ObjectType} from '@nestjs/graphql';
 
 @Entity({name: 'users'})
 @ObjectType()
-export class User {
+export class UserNode {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   readonly idNumber: number;
@@ -50,9 +50,9 @@ export class User {
   @Field()
   updatedAt: Date;
 
-  @Column({default: RoleEnum.USER, enum: RoleEnum, type: 'enum'})
-  @Field(() => RoleEnum)
-  role: RoleEnum;
+  @Column({default: RoleType.USER, enum: RoleType, type: 'enum'})
+  @Field(() => RoleType)
+  role: RoleType;
 
   @BeforeInsert()
   async hashPassword() {

@@ -1,10 +1,10 @@
-import {RoleEnum} from '../enums/role.enum';
+import {RoleType} from '../enums/role.type';
 
 export interface EncryptedUserInterface {
   idNumber: number;
   id: string;
   email: string;
-  role: RoleEnum;
+  role: RoleType;
   iat?: number;
   exp?: number;
 }

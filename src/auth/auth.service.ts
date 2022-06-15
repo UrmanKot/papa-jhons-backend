@@ -1,6 +1,6 @@
 import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {CreateUserInput} from '../user/dto/create-user.input';
-import {User} from '../user/entities/user.entity';
+import {UserNode} from '../user/entities/user.entity';
 import {Repository} from 'typeorm';
 import {InjectRepository} from '@nestjs/typeorm';
 import {MailService} from '../shared/services/mail.service';
@@ -13,13 +13,13 @@ import {TokenService} from './services/token.service';
 @Injectable()
 export class AuthService {
   constructor(
-      @InjectRepository(User) private readonly userRepository: Repository<User>,
+      @InjectRepository(UserNode) private readonly userRepository: Repository<UserNode>,
       private readonly mailService: MailService,
       private readonly tokenService: TokenService,
   ) {
   }
 
-  async register(createUserInput: CreateUserInput): Promise<User> {
+  async register(createUserInput: CreateUserInput): Promise<UserNode> {
     const candidate = await this.userRepository.findOne({email: createUserInput.email});
 
     if (candidate) {
@@ -28,7 +28,7 @@ export class AuthService {
 
     const activationLink: string = v4();
 
-    const newUser = new User();
+    const newUser = new UserNode();
     newUser.activationLink = activationLink;
     Object.assign(newUser, createUserInput);
 
@@ -47,7 +47,7 @@ export class AuthService {
     await this.userRepository.save(user);
   }
 
-  async login(loginUserDto: LoginUserInput): Promise<User> {
+  async login(loginUserDto: LoginUserInput): Promise<UserNode> {
     const user = await this.userRepository.findOne({email: loginUserDto.email}, {
       select: ['id', 'idNumber', 'email', 'firstName', 'lastName', 'image', 'password', 'isActivated', 'createdAt', 'updatedAt', 'role']
     });
@@ -70,7 +70,7 @@ export class AuthService {
     return user;
   }
 
-  async getCurrentUser(id: number): Promise<User> {
+  async getCurrentUser(id: number): Promise<UserNode> {
     const currentUser = await this.userRepository.findOne(id);
 
     if (!currentUser) {
@@ -80,7 +80,7 @@ export class AuthService {
     return currentUser;
   }
 
-  buildUserResponseForLogin(user: User): LoginUserResponse {
+  buildUserResponseForLogin(user: UserNode): LoginUserResponse {
     return {
       tokens: this.tokenService.generateTokens(user),
       user: user,

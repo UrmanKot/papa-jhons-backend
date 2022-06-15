@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateProductInput {
+  carbs: Int
+  category: String!
+  count: Int
+  description: String!
+  energyValue: Int
+  greases: Int
+  isAddNutritionalValue: Boolean!
+  name: String!
+  price: Int!
+  proteins: Int
+  weight: Int
+}
+
 input CreateUserInput {
   email: String!
   password: String!
@@ -19,19 +33,70 @@ input LoginUserInput {
 
 type LoginUserResponse {
   tokens: Tokens!
-  user: User!
+  user: UserNode!
 }
 
 type Mutation {
+  createProduct(createProductInput: CreateProductInput!, file: Upload): ProductNode!
   login(loginUserInput: LoginUserInput!): LoginUserResponse!
-  register(createUserInput: CreateUserInput!): User!
+  register(createUserInput: CreateUserInput!): UserNode!
+}
+
+enum ProductCategoryType {
+  COMBOBOX
+  DESSERT
+  DRINKS
+  HOT
+  PIZZA
+  SAUCES
+  SNACKS
+  VEGAN
+}
+
+type ProductNode {
+  """Углеводы"""
+  carbs: Int
+  category: ProductCategoryType!
+
+  """Количество"""
+  count: Int
+  createdAt: DateTime!
+  description: String!
+
+  """Энергетическая ценность"""
+  energyValue: Int
+
+  """Жиры"""
+  greases: Int
+  id: String!
+  idNumber: ID!
+  image: String
+
+  """Добавить пищевую ценность?"""
+  isAddNutritionalValue: Boolean!
+  name: String!
+
+  """Цена"""
+  price: Int!
+
+  """Белки"""
+  proteins: Int
+
+  """Цена по скидке"""
+  salePrice: Int
+  updatedAt: DateTime!
+
+  """Вес"""
+  weight: Int
 }
 
 type Query {
-  getCurrentUser: User!
+  getCurrentUser: UserNode!
+  product(id: String!): ProductNode!
+  products: [ProductNode!]!
 }
 
-enum RoleEnum {
+enum RoleType {
   ADMIN
   USER
 }
@@ -41,7 +106,10 @@ type Tokens {
   refreshToken: String!
 }
 
-type User {
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type UserNode {
   createdAt: DateTime!
   email: String!
   firstName: String!
@@ -50,6 +118,6 @@ type User {
   image: String
   isActivated: Boolean!
   lastName: String!
-  role: RoleEnum!
+  role: RoleType!
   updatedAt: DateTime!
 }
