@@ -11,7 +11,6 @@ import {GraphQLError, GraphQLFormattedError} from 'graphql';
 import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import {FilesModule} from './shared/modules/files/files.module';
 import { ProductModule } from './product/product.module';
-import {GlobalIdScalar} from 'nestjs-relay';
 
 @Module({
   imports: [
@@ -54,7 +53,7 @@ import {GlobalIdScalar} from 'nestjs-relay';
     FilesModule,
     ProductModule
   ],
-  providers: [AppService, GlobalIdScalar],
+  providers: [AppService],
 })
 
 export class AppModule implements NestModule {
