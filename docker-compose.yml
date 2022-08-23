@@ -1,8 +1,39 @@
 version: '3.8'
-
 services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 8080:3000
+      - 9229:9229
+    environment:
+#      - API_PORT=${API_PORT}
+#      - API_HOST=${API_HOST}
+      - TYPEORM_CONNECTION=${TYPEORM_CONNECTION}
+      - TYPEORM_USERNAME=${TYPEORM_USERNAME}
+      - TYPEORM_PASSWORD=${TYPEORM_PASSWORD}
+      - TYPEORM_DATABASE=${TYPEORM_DATABASE}
+      - TYPEORM_PORT=${TYPEORM_PORT}
+      - TYPEORM_HOST=db
+      - TYPEORM_SYNCHRONIZE=false
+    command: npm run start:dev
+    entrypoint: ['/bin/bash', './entrypoint.sh']
+    volumes:
+      - /app/node_modules
+      - ./src:/app/src
+    depends_on:
+      - redis
+      - db
+    env_file: .env
+
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - 6379:${REDIS_PORT}
+
   db:
-    container_name: graph
+    container_name: backend-papa-jhons
     image: postgres:14.0-alpine
     restart: always
     environment:

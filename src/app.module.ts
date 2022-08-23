@@ -11,6 +11,7 @@ import {GraphQLError, GraphQLFormattedError} from 'graphql';
 import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import {FilesModule} from './shared/modules/files/files.module';
 import { ProductModule } from './product/product.module';
+import { PubSubModule } from './shared/modules/pubsub/pubSubModule';
 
 @Module({
   imports: [
@@ -18,9 +19,8 @@ import { ProductModule } from './product/product.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
-      buildSchemaOptions: {
-        numberScalarMode: 'integer'
-      },
+      buildSchemaOptions: {numberScalarMode: 'integer'},
+      subscriptions: {'subscriptions-transport-ws': true,},
       path: '/graphql',
       sortSchema: true,
       playground: true,
@@ -48,10 +48,11 @@ import { ProductModule } from './product/product.module';
         logging: true,
       } as TypeOrmModuleAsyncOptions),
     }),
+    PubSubModule,
     AuthModule,
     UserModule,
     FilesModule,
-    ProductModule
+    ProductModule,
   ],
   providers: [AppService],
 })

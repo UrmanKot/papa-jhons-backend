@@ -5,7 +5,7 @@
 input CreateProductInput {
   carbs: Int
   category: String!
-  count: Int
+  count: Int!
   description: String!
   energyValue: Int
   greases: Int
@@ -37,9 +37,27 @@ type LoginUserResponse {
 }
 
 type Mutation {
-  createProduct(createProductInput: CreateProductInput!, file: Upload): ProductNode!
   login(loginUserInput: LoginUserInput!): LoginUserResponse!
+  productCreate(createProductInput: CreateProductInput!, file: Upload): ProductNode!
+  productRemove(id: String!): Boolean!
   register(createUserInput: CreateUserInput!): UserNode!
+}
+
+enum OrderByDirection {
+  ASC
+  DESC
+}
+
+input OrderByInput {
+  createdAt: OrderByDirection
+  updatedAt: OrderByDirection
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
 }
 
 enum ProductCategoryType {
@@ -90,15 +108,48 @@ type ProductNode {
   weight: Int
 }
 
+type ProductNodeConnection {
+  edges: [ProductNodeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProductNodeEdge {
+  cursor: String!
+  node: ProductNode!
+}
+
 type Query {
   getCurrentUser: UserNode!
   product(id: String!): ProductNode!
   products: [ProductNode!]!
+  recipes2(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Int
+
+    """Paginate last"""
+    last: Int
+    orderBy: OrderByInput
+    where: RecipeWhereInput
+  ): ProductNodeConnection!
+}
+
+input RecipeWhereInput {
+  name: String
 }
 
 enum RoleType {
   ADMIN
   USER
+}
+
+type Subscription {
+  productAdded: ProductNode!
 }
 
 type Tokens {

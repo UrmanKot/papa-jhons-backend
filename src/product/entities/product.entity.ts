@@ -1,6 +1,8 @@
 import {BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn} from 'typeorm';
 import {Field, ID, ObjectType} from '@nestjs/graphql';
 import {ProductCategoryType} from '../enums/product-category.type';
+import * as Relay from "graphql-relay";
+import {PageInfo} from 'nestjs-graphql-relay';
 
 @Entity({name: 'products'})
 @ObjectType()
@@ -82,4 +84,22 @@ export class ProductNode {
   updateTimestamp() {
     this.updatedAt = new Date();
   }
+}
+
+@ObjectType({ isAbstract: true })
+abstract class ProductNodeEdge implements Relay.Edge<ProductNode> {
+  @Field(() => ProductNode)
+  readonly node: ProductNode;
+
+  @Field()
+  readonly cursor: Relay.ConnectionCursor;
+}
+
+@ObjectType()
+export class ProductNodeConnection implements Relay.Connection<ProductNode> {
+  @Field()
+  readonly pageInfo: PageInfo;
+
+  @Field(() => [ProductNodeEdge])
+  readonly edges: Array<Relay.Edge<ProductNode>>;
 }
